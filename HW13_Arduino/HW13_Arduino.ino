@@ -1,54 +1,54 @@
-#include <ArduinoJson.h>
+// 定义引脚
+const int JOYSTICK_X = A0;    // 操纵杆X轴
+const int JOYSTICK_Y = A1;    // 操纵杆Y轴
+const int POT_PIN = A2;       // 电位器
+const int BUTTON_PIN = 2;     // 按钮
 
-// project variables
-int a0Val = 0;
-int d2Val = 0;
-int d2ClickCount = 0;
-
-int prevD2Val = 0;
-
-void sendData() {
-  StaticJsonDocument<128> resJson;
-  JsonObject data = resJson.createNestedObject("data");
-  JsonObject A0 = data.createNestedObject("A0");
-  JsonObject D2 = data.createNestedObject("D2");
-
-  A0["value"] = a0Val;
-  D2["isPressed"] = d2Val;
-  D2["count"] = d2ClickCount;
-
-  String resTxt = "";
-  serializeJson(resJson, resTxt);
-
-  Serial.println(resTxt);
-}
+// 按钮状态变量
+int lastButtonState = HIGH;
+int buttonState;
 
 void setup() {
-  // Serial setup
   Serial.begin(9600);
-  while (!Serial) {}
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  pinMode(JOYSTICK_X, INPUT);
+  pinMode(JOYSTICK_Y, INPUT);
+  pinMode(POT_PIN, INPUT);
+  
+  Serial.println("Arduino ready!"); // 调试信息
 }
 
 void loop() {
-  // read pins
-  a0Val = analogRead(A0);
-  d2Val = digitalRead(2);
-
-  // calculate if d2 was clicked
-  if (d2Val && d2Val != prevD2Val) {
-    d2ClickCount++;
-  }
-
-  prevD2Val = d2Val;
-
-  // check if there was a request for data, and if so, send new data
   if (Serial.available() > 0) {
-    int byteIn = Serial.read();
-    if (byteIn == 0xAB) {
-      Serial.flush();
-      sendData();
+    if (Serial.read() == 0xAB) {
+      // 读取所有传感器数据
+      int xValue = analogRead(JOYSTICK_X);
+      int yValue = analogRead(JOYSTICK_Y);
+      int potValue = analogRead(POT_PIN);
+      buttonState = digitalRead(BUTTON_PIN);
+      
+      // 发送JSON格式数据
+      Serial.print("{\"data\":{");
+      
+      // 操纵杆数据
+      Serial.print("\"joystick\":{");
+      Serial.print("\"x\":");
+      Serial.print(xValue);
+      Serial.print(",\"y\":");
+      Serial.print(yValue);
+      Serial.print("},");
+      
+      // 电位器数据
+      Serial.print("\"A2\":{\"value\":");
+      Serial.print(potValue);
+      Serial.print("},");
+      
+      // 按钮数据
+      Serial.print("\"D2\":{\"isPressed\":");
+      Serial.print(buttonState == LOW ? "true" : "false");
+      Serial.print("}");
+      
+      Serial.println("}}");
     }
   }
-
-  delay(2);
 }
