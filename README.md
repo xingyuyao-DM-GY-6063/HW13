@@ -1,7 +1,10 @@
 # HW13
 ## Description
 This is an interactive pattern generator based on Arduino and p5.js. The position of pattern generation is controlled by a joystick, and the potentiometer adjusts the characteristics of the shape, realizing real-time visual art creation. The system automatically and continuously generates patterns.
-
+[HW04A](https://xingyuyao-dm-gy-6063.github.io/HW04/HW04A/)  
+![HW04A IMAGE](image.png)  
+[VIDEO-0](https://drive.google.com/file/d/1Ne9MBf-DMLIimhs8tZbwIXOGBeUfVOZY/view?usp=sharing)  
+[VIDEO-1](https://drive.google.com/file/d/1CDqQ6wE8fOfTstcJpJq2vri7Yr3cJN6u/view?usp=sharing)
 ## Features
 - Automatic continuous pattern generation
 - Random color and transparency
